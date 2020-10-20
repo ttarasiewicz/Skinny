@@ -1,4 +1,4 @@
-from utils import Models
+from utils import models
 from utils.Preprocessor import Preprocessor
 from utils.DataLoader import DataLoader
 from utils.Trainer import Trainer
@@ -38,8 +38,8 @@ def train_function(model: tf.keras.Model, batch_size: int) -> None:
 
 
 scheduler = TrainingScheduler()
-scheduler.add_training_data(Models.SkinnyNOID(levels, 15),
-                            train_function, batch_size=5)
-scheduler.add_training_data(Models.SkinnyNOD(levels, 20), train_function, batch_size=3)
-scheduler.add_training_data(Models.Skinny(levels, 19), train_function, batch_size=3)
+scheduler.add_training_data(
+    models.SkinnyNOID(levels, 15), train_function, batch_size=5)
+scheduler.add_training_data(models.SkinnyNOD(levels, 20), train_function, batch_size=3)
+scheduler.add_training_data(models.Skinny(levels, 19), train_function, batch_size=3)
 scheduler.train()

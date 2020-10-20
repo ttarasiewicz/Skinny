@@ -50,10 +50,10 @@ class Trainer:
         for callback in callbacks:
             self.callbacks.append(callback)
 
-    def __configure_callbacks(self, **args):
+    def __configure_callbacks(self, **kwargs):
         callback: utils.callbacks.CustomCallback
         for callback in self.callbacks:
-            callback.set_timelog(**args)
+            callback.set_timelog(**kwargs)
 
     def __combined_loss(self):
         def loss(y_true, y_pred):

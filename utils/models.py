@@ -56,7 +56,7 @@ class Model(ABC):
         self.model = self.create_model()
         if self.checkpoint_path is not None:
             try:
-                path = os.path.join(self.checkpoint_path, 'checkpoint')
+                path = os.path.join(self.checkpoint_path, 'checkpoint', 'saved_model.ckpt')
                 self.model.load_weights(path)
             except Exception as e:
                 raise e

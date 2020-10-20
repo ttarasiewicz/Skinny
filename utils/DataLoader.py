@@ -9,10 +9,10 @@ class DataLoader(object):
     def __init__(self, dataset_dir: str, batch_size: int, preprocessor: Preprocessor = None):
         self.dataset_dir = dataset_dir
         self.batch_size = batch_size
-        self.__preprocessor = Preprocessor() if preprocessor is None else preprocessor
-        self.train_dataset = self.__create_dataset_pipeline('train')
-        self.val_dataset = self.__create_dataset_pipeline('val')
-        self.test_dataset = self.__create_dataset_pipeline('test')
+        self.val_dataset = None
+        self.train_dataset = None
+        self.test_dataset = None
+        self.preprocessor = Preprocessor() if preprocessor is None else preprocessor
 
     @property
     def train_dataset(self):
@@ -45,12 +45,12 @@ class DataLoader(object):
     @preprocessor.setter
     def preprocessor(self, preprocessor: Preprocessor):
         self.__preprocessor = preprocessor
-        self.reinstantiate()
+        self.__reinstantiate()
 
-    def reinstantiate(self):
+    def __reinstantiate(self):
         self.train_dataset = self.__create_dataset_pipeline('train')
-        self.val_dataset = self.__create_dataset_pipeline('val')
-        self.test_dataset = self.__create_dataset_pipeline('test')
+        self.val_dataset = self.__create_dataset_pipeline('val', shuffle=False)
+        self.test_dataset = self.__create_dataset_pipeline('test', shuffle=False)
 
     def __batch_and_prefetch(self, dataset: tf.data.Dataset) -> tf.data.Dataset:
         return dataset.\
@@ -66,7 +66,7 @@ class DataLoader(object):
                   os.path.join(self.dataset_dir, 'org', 'labels', filename + '.png')) for filename in files]
         return files
 
-    def __create_dataset_pipeline(self, subset: str) -> tf.data.Dataset:
+    def __create_dataset_pipeline(self, subset: str, shuffle: bool = True) -> tf.data.Dataset:
         def process_example_paths(example):
             return {'feature': tf.io.decode_jpeg(tf.io.read_file(example[0]), channels=3),
                     'label': tf.io.decode_png(tf.io.read_file(example[1]), channels=1)}
@@ -79,5 +79,7 @@ class DataLoader(object):
         dataset = tf.data.Dataset.from_tensor_slices(dataset)
         dataset = dataset.map(process_example_paths)
         dataset = self.preprocessor.add_to_graph(dataset)
-        dataset = dataset.map(convert_to_in_out_dicts).cache().shuffle(2000, reshuffle_each_iteration=True)
+        dataset = dataset.map(convert_to_in_out_dicts).cache()
+        if shuffle:
+            dataset = dataset.shuffle(2000, reshuffle_each_iteration=True)
         return dataset

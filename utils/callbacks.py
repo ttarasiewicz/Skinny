@@ -4,6 +4,7 @@ from tensorflow import keras
 
 class CustomCallback(keras.callbacks.Callback):
     timelog = None
+    checkpoint_name = 'saved_model.ckpt'
 
     def set_timelog(self, timelog, **kwargs):
         self.timelog = timelog
@@ -12,8 +13,10 @@ class CustomCallback(keras.callbacks.Callback):
 class ModelCheckpoint(keras.callbacks.ModelCheckpoint, CustomCallback):
     def set_model(self, model):
         assert self.timelog is not None, "Starting time of the training hasn't been logged!"
-        self.filepath = os.path.join(self.filepath, model.name, self.timelog, 'checkpoint')
-        os.makedirs(self.filepath, exist_ok=True)
+        dir_name = os.path.join(self.filepath, model.name, self.timelog, 'checkpoint')
+        os.makedirs(dir_name, exist_ok=True)
+        self.filepath =  os.path.join(dir_name, self.checkpoint_name)
+
         super().set_model(model)
 
 

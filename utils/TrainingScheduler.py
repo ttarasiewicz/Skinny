@@ -1,5 +1,5 @@
 import tensorflow as tf
-from utils import Models
+from utils import models
 from typing import Callable, Any
 
 
@@ -7,7 +7,7 @@ class TrainingScheduler:
     def __init__(self) -> None:
         self.data = []
 
-    def add_training_data(self, model: Models.Model,
+    def add_training_data(self, model: models.Model,
                           training_func: Callable[[tf.keras.Model, Any], None],
                           **kwargs) -> None:
         self.data.append((model, training_func, kwargs))
