@@ -59,7 +59,6 @@ class Model(ABC):
                 path = os.path.join(self.checkpoint_path, 'checkpoint')
                 self.model.load_weights(path)
             except Exception as e:
-                print(os.getcwd())
                 raise e
         return self.model
 

@@ -16,7 +16,7 @@ preprocessor = Preprocessor()
 preprocessor.cast(dtype=tf.float32).normalize().downscale(max_pixel_count=512**2).pad(network_levels=levels)
 
 
-def train_function(model: tf.keras.Model, batch_size) -> None:
+def train_function(model: tf.keras.Model, batch_size: int) -> None:
     data_loader = DataLoader(dataset_dir=r'dataset', batch_size=batch_size, preprocessor=preprocessor)
     trainer = Trainer(data_loader=data_loader, model=model)
     trainer.add_losses([K.binary_crossentropy, losses.dice_loss])

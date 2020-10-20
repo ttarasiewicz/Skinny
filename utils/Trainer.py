@@ -1,16 +1,8 @@
 import os
-import matplotlib.pyplot as plt
-import numpy as np
 import tensorflow as tf
-import tensorflow.keras as keras
-from tensorflow.keras import backend as K
-from tensorflow.keras.models import load_model
-import datetime
 import time
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import ElementTree, Element, SubElement, Comment, tostring
 from utils.DataLoader import DataLoader
-from utils import callbacks
+import utils
 
 
 class Trainer:
@@ -46,20 +38,20 @@ class Trainer:
         for metric in metrics:
             self.metrics.append(metric)
 
-    def add_losses(self, losses):
+    def add_losses(self, losses) -> None:
         if type(losses) is not list:
             losses = [losses]
         for loss in losses:
             self.losses.append(loss)
 
-    def add_callbacks(self, callbacks):
+    def add_callbacks(self, callbacks) -> None:
         if type(callbacks) is not list:
             callbacks = [callbacks]
         for callback in callbacks:
             self.callbacks.append(callback)
 
     def __configure_callbacks(self, **args):
-        callback: callbacks.CustomCallback
+        callback: utils.callbacks.CustomCallback
         for callback in self.callbacks:
             callback.set_timelog(**args)
 
