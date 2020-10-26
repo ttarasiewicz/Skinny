@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Model_description>
+	<name>Skinny_NoD</name>
+	<parameters>7197581</parameters>
+	<deepness>6</deepness>
+	<color_map>rgb</color_map>
+	<epochs>200</epochs>
+	<loss>
+		<loss_0>binary_crossentropy</loss_0>
+		<loss_1>dice_loss</loss_1>
+	</loss>
+	<inference>
+		<inference_0>
+			<time_min>0.059</time_min>
+			<time_max>0.065</time_max>
+			<image_width>960</image_width>
+			<image_height>512</image_height>
+		</inference_0>
+	</inference>
+	<test dataset="ECU">
+		<f1>0.92606</f1>
+		<precision>0.91848</precision>
+		<recall>0.93377</recall>
+		<threshold>0.37566</threshold>
+	</test>
+	<test dataset="HGR">
+		<f1>0.95387</f1>
+		<precision>0.95028</precision>
+		<recall>0.95749</recall>
+		<threshold>0.25912</threshold>
+	</test>
+	<additional_notes>U-Net + Inception, RGB only, 1750/250/2000 - train/val/test</additional_notes>
+</Model_description>

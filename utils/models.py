@@ -3,7 +3,9 @@ import tensorflow.keras as keras
 import tensorflow.keras.layers as layers
 from tensorflow.keras.utils import plot_model
 import os
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+import time
+from tensorflow.keras.models import load_model
 
 
 def inception_module(prev_layer, filters: int, activation=layers.LeakyReLU):
@@ -39,28 +41,52 @@ def get_filters_count(level: int, initial_filters: int) -> int:
     return 2**(level-1)*initial_filters
 
 
-class Model(ABC):
-    def __init__(self, levels: int, initial_filters: int,
-                 image_channels: int = 3, checkpoint_path: str = None) -> None:
+class Model:
+    def __init__(self, levels: int = None, initial_filters: int = None,
+                 image_channels: int = None, log_dir: str = 'logs',
+                 load_checkpoint: bool = False, checkpoint_extension: str = 'ckpt',
+                 model_name: str = None) -> None:
         self.levels = levels
         self.initial_filters = initial_filters
         self.image_channels = image_channels
-        self.checkpoint_path = checkpoint_path
-        self.model = None
-
-    def load_weights(self) -> keras.Model:
-        self.model.load_weights()
-        return self.model
+        self.keras_model = None
+        self.log_dir = log_dir
+        self.checkpoint_extension = checkpoint_extension
+        if model_name is not None:
+            self.name = model_name
+        self.load_checkpoint = load_checkpoint
+        if not load_checkpoint and os.path.isdir(self.get_logdir()):
+            self.name = self.name+'_'+self.__get_timestamp()
 
     def get_model(self) -> keras.Model:
-        self.model = self.create_model()
-        if self.checkpoint_path is not None:
+        path = os.path.join(self.log_dir, self.name, 'checkpoint', f'saved_model.{self.checkpoint_extension}')
+        if self.load_checkpoint and self.checkpoint_extension == 'h5':
+            self.keras_model = load_model(path, compile=False)
+            return self.keras_model
+
+        self.keras_model = self.create_model()
+        self.__change_model_name()
+        self.__plot_model(self.keras_model)
+        if self.load_checkpoint:
             try:
-                path = os.path.join(self.checkpoint_path, 'checkpoint', 'saved_model.ckpt')
-                self.model.load_weights(path)
+                self.keras_model.load_weights(path)
             except Exception as e:
                 raise e
-        return self.model
+        return self.keras_model
+
+    def __plot_model(self, model: keras.Model) -> None:
+        plot_model(model, to_file=os.path.join(self.log_dir, self.name, 'model.png'), show_shapes=True)
+
+    def __change_model_name(self) -> None:
+        if self.name is not None and self.keras_model is not None:
+            self.keras_model._name = self.name
+
+    def get_logdir(self) -> str:
+        return os.path.join(self.log_dir, self.name)
+
+    def __get_timestamp(self) -> str:
+        self.timestamp = time.strftime("%Y%m%d-%H%M%S")
+        return self.timestamp
 
     @abstractmethod
     def create_model(self) -> keras.Model:
@@ -109,7 +135,6 @@ class Skinny(Model):
                                        activation='sigmoid', name='label')(layers_list[1])
 
         model = keras.Model(inputs=[layers_list[0]], outputs=[layers_list[1]], name=self.name)
-        plot_model(model, to_file=f'{self.name}.png', show_shapes=True)
         return model
 
 
@@ -153,7 +178,6 @@ class SkinnyNOD(Model):
                                        activation='sigmoid', name='label')(layers_list[1])
 
         model = keras.Model(inputs=[layers_list[0]], outputs=[layers_list[1]], name=self.name)
-        plot_model(model, to_file=f'{self.name}.png', show_shapes=True)
         return model
 
 
@@ -201,5 +225,4 @@ class SkinnyNOID(Model):
                                        activation='sigmoid', name='label')(layers_list[1])
 
         model = keras.Model(inputs=[layers_list[0]], outputs=[layers_list[1]], name=self.name)
-        plot_model(model, to_file=f'{self.name}.png', show_shapes=True)
         return model

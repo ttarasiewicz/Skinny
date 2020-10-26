@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Model_description>
+	<name>202000123-105816</name>
+	<parameters>7327558</parameters>
+	<deepness>6</deepness>
+	<color_map>rgb</color_map>
+	<epochs>200</epochs>
+	<loss>
+		<loss_0>binary_crossentropy</loss_0>
+		<loss_1>dice_loss</loss_1>
+	</loss>
+	<inference>
+		<inference_0>
+			<time_min>0.069</time_min>
+			<time_max>0.076</time_max>
+			<image_width>960</image_width>
+			<image_height>512</image_height>
+		</inference_0>
+	</inference>
+	<test dataset="ECU">
+		<f1>0.92876</f1>
+		<precision>0.92368</precision>
+		<recall>0.93389</recall>
+		<threshold>0.50000</threshold>
+	</test>
+	<test dataset="HGR">
+		<f1>0.95935</f1>
+		<precision>0.95474</precision>
+		<recall>0.96401</recall>
+		<threshold>0.15773</threshold>
+	</test>
+	<additional_notes>U-Net + Inception + Dense, RGB only, 1750/250/2000 - train/val/test</additional_notes>
+</Model_description>
